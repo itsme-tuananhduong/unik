@@ -3,7 +3,7 @@ class BaseComponent extends HTMLElement {
     state;
     constructor() {
         super();
-        this._shadowRoot = this.attachShadow({mode: 'open'});
+        this._shadowRoot = this.attachShadow({ mode: 'open' });
         this.props = {};
         this.state = {};
     }
@@ -46,4 +46,4 @@ class BaseComponent extends HTMLElement {
     }
 }
 
-export {BaseComponent};
+export { BaseComponent };
