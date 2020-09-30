@@ -7,7 +7,9 @@ class SignInScreen extends BaseComponent {
 
     render() {
         this._shadowRoot.innerHTML = /*html*/ `
-        
+            <div class="sign-in-screen-wrapper">
+                <sign-in-form></sign-in-form>
+            </div>
         `;
     }
 }

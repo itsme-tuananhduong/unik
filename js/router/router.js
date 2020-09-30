@@ -1,7 +1,7 @@
 var root = null;
 var useHash = true; // Defaults to: false
 var hash = '#!'; // Defaults to: '#'
-var router = new Navigo(root, useHash, hash);
+window.router = new Navigo(root, useHash, hash);
 
 let $content = document.getElementById('content');
 
@@ -36,3 +36,7 @@ window.router.on('/search', function () {
 window.router.on('/user-board', function () {
     $content.innerHTML = '<user-board></user-board>';
 }).resolve();
+
+window.router.notFound(function () {
+    $content.innerHTML = `<p>404 Error</p>`;
+});
