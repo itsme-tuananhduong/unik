@@ -1,5 +1,5 @@
 import { BaseComponent } from "../component/base_component.js";
-import { validateEmail, randomID } from "../utility.js";
+import { validateEmail } from "../utility.js";
 
 const style = /*html*/ ``;
 
@@ -15,7 +15,6 @@ class SignUpForm extends BaseComponent {
                 location: ''
             },
             data: {
-                ID: '',
                 age: '',
                 description: '',
                 email: '',
@@ -130,7 +129,6 @@ class SignUpForm extends BaseComponent {
             // update len firebase
             if (isValid) {
                 // set ID va joinDate
-                this.state.data.ID = randomID();
                 this.state.data.joinDate = new Date().toLocaleString();
                 // up du lieu len firebase
                 await firebase.firestore().collection('user').add(this.state.data);

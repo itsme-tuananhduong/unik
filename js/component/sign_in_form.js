@@ -10,6 +10,10 @@ class SignInForm extends BaseComponent {
             error: {
                 email: '',
                 password: ''
+            },
+            data: {
+                email: '',
+                password: ''
             }
         }
     }
