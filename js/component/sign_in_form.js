@@ -10,25 +10,6 @@ class SignInForm extends BaseComponent {
             error: {
                 email: '',
                 password: ''
-            },
-            data: {
-                ID: '',
-                age: '',
-                description: '',
-                email: '',
-                follower: [],
-                following: [],
-                jobTitle: '',
-                joinDate: '',
-                label: '',
-                location: '',
-                password: '',
-                project: [],
-                savedProject: [],
-                totalRespect: 0,
-                userName: '',
-                webReference: [],
-                workExperience: ''
             }
         }
     }
