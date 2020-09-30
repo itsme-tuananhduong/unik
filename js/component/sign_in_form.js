@@ -20,21 +20,21 @@ class SignInForm extends BaseComponent {
 
     render() {
         this._shadowRoot.innerHTML = /*html*/ `
-        <div class="wrapper">
-            <form class="sign-in-form">
-                <label for="email">Email address</label><br>
-                <input type="email" class="email" name="email" value="${this.state.data.email}">
-                <p class="email-error">${this.state.error.email}</p>
-                <label for="password">Password</label><br>
-                <input type="password" class="password" name="password" value="${this.state.data.password}">
-                <p class="password-error">${this.state.error.password}</p>
-            </form>
-            <div class="btn">
-                <button class="btn-cancel">Cancel</button>
-                <button class="btn-sign-in">Sign In</button>
+            <div class="wrapper">
+                <form class="sign-in-form">
+                    <label for="email">Email address</label><br>
+                    <input type="email" class="email" name="email" value="${this.state.data.email}" placeholder="unik@unik.com">
+                    <p class="email-error">${this.state.error.email}</p>
+                    <label for="password">Password</label><br>
+                    <input type="password" class="password" name="password" value="${this.state.data.password}" placeholder="123456">
+                    <p class="password-error">${this.state.error.password}</p>
+                </form>
+                <div class="btn">
+                    <button class="btn-cancel">Cancel</button>
+                    <button class="btn-sign-in">Sign In</button>
+                </div>
+                <a href="#!/sign-up">New user? Create an account</a>
             </div>
-            <a href="#!/sign-up">New user? Create an account</a>
-        </div>
         `;
 
         this.$btnCancel = this._shadowRoot.querySelector('.btn-cancel');

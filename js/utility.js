@@ -3,10 +3,6 @@ export function validateEmail(email) {
     return re.test(String(email).toLowerCase());
 }
 
-// export function randomID() {
-//     return Math.random().toString(36).substring(2);
-// }
-
 export function setCurrentUser(currentUser) {
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
 }

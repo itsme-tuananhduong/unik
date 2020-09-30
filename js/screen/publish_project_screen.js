@@ -1,18 +1,18 @@
 import { BaseComponent } from "../component/base_component.js";
 
-class SignUpScreen extends BaseComponent {
+class PublishProjectScreen extends BaseComponent {
     constructor() {
         super();
     }
 
     render() {
         this._shadowRoot.innerHTML = /*html*/ `
-            <div class="sign-up-screen">
-                <sign-up-form></sign-up-form>
+            <div class="publish-project-screen">
+                <publish-project-form></publish-project-form>
                 <footer-box></footer-box>
             </div>
         `;
     }
 }
 
-window.customElements.define('sign-up-screen', SignUpScreen);
+window.customElements.define('publish-project-screen', PublishProjectScreen);

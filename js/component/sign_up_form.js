@@ -16,6 +16,8 @@ class SignUpForm extends BaseComponent {
             },
             data: {
                 age: '',
+                avatar: '',
+                cover: '',
                 description: '',
                 email: '',
                 follower: [],
@@ -41,19 +43,19 @@ class SignUpForm extends BaseComponent {
             <div class="wrapper">
                 <form class="sign-up-form">
                     <label for="email">Email address</label><br>
-                    <input type="email" class="email" name="email" value="${this.state.data.email}">
+                    <input type="email" class="email" name="email" value="${this.state.data.email}" placeholder="unik@unik.com">
                     <p class="email-error">${this.state.error.email}</p>
                     <label for="password">Password</label><br>
-                    <input type="password" class="password" name="password" value="${this.state.data.password}">
+                    <input type="password" class="password" name="password" value="${this.state.data.password}" placeholder="123456">
                     <p class="password-error">${this.state.error.password}</p>
                     <label for="name">Your name</label><br>
-                    <input type="text" class="name" name="name" value="${this.state.data.userName}">
+                    <input type="text" class="name" name="name" value="${this.state.data.userName}" placeholder="Samuel Edwards">
                     <p class="name-error">${this.state.error.userName}</p>
                     <label for="age">Your age</label><br>
-                    <input type="text" class="age" name="age" value="${this.state.data.age}">
+                    <input type="text" class="age" name="age" value="${this.state.data.age}" placeholder="18">
                     <p class="age-error">${this.state.error.age}</p>
                     <label for="location">Your location</label><br>
-                    <input type="text" class="location" name="location" value="${this.state.data.location}">
+                    <input type="text" class="location" name="location" value="${this.state.data.location}" placeholder="Vietnam">
                     <p class="location-error">${this.state.error.location}</p>
                 </form>
                 <div class="btn">
