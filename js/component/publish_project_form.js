@@ -1,9 +1,11 @@
 import { BaseComponent } from "../component/base_component.js";
+import { getCurrentUser, renderID } from "../utility.js";
 
 class PublishProjectForm extends BaseComponent {
     constructor() {
         super();
         this.state = {
+            html: '<img src="" alt="content">',
             error: {
                 content: '',
                 cover: '',
@@ -26,17 +28,17 @@ class PublishProjectForm extends BaseComponent {
 
     render() {
         this._shadowRoot.innerHTML = /*html*/ `
-        <link rel="stylesheet" href="../../css/style.css">
             <div class="wrapper">
                 <div class="section-1">
                     <!-- upload cover -->
                     <div class="section-1-1">
-                        <img src="" alt="cover">
                         <p class="cover-error">${this.state.error.cover}</p>
+                        <progress value="0" max="100" class="cover-uploader" style="display:none"></progress>
                         <form class="upload-cover">
-                            <label for="project-cover">Project cover</label><br>
-                            <input type="file" id="project-cover" name="project-cover">
+                            <label for="cover">Project cover</label><br>
+                            <input type="file" class="cover" name="cover">
                         </form>
+                        <img src="${this.state.data.cover}" alt="cover">
                     </div>
                     <!-- nhap title, description,... -->
                     <div class="section-1-2">
@@ -50,32 +52,176 @@ class PublishProjectForm extends BaseComponent {
                         <div class="choose-tag-form">
                             <p class="tag-error">${this.state.error.tag}</p>
                             <form class="choose-tag">
-                                <input type="checkbox" id="graphic-design" name="graphic-design" value="graphic-design">
+                                <input type="checkbox" class="graphic-design" name="tag" value="graphic-design">
                                 <label for="graphic-design">Graphic design</label>
-                                <input type="checkbox" id="photography" name="photography" value="photography">
+                                <input type="checkbox" class="photography" name="tag" value="photography">
                                 <label for="photography">Photography</label>
-                                <input type="checkbox" id="illustration" name="illustration" value="illustration">
+                                <input type="checkbox" class="illustration" name="tag" value="illustration">
                                 <label for="illustration">Illustration</label>
-                                <input type="checkbox" id="motion" name="motion" value="motion">
+                                <input type="checkbox" class="motion" name="tag" value="motion">
                                 <label for="motion">Motion</label>
-                                <input type="checkbox" id="product-design" name="product-design" value="product-design">
+                                <input type="checkbox" class="product-design" name="tag" value="product-design">
                                 <label for="product-design">Product design</label>
                             </form>
                         </div>
                     </div>
                 </div>
 
+                <div class="btn">
+                    <button class="btn-cancel">Cancel</button>
+                    <button class="btn-publish">Publish</button>
+                </div>
+
                 <!-- upload image -->
                 <div class="section-2">
-                    <img src="" alt="content">
                     <p class="content-error">${this.state.error.content}</p>
+                    <progress value="0" max="100" class="content-uploader" style="display:none"></progress>
                     <form class="upload-content">
                         <label for="content">Add content</label><br>
-                        <input type="file" id="content" name="content">
+                        <input type="file" class="content" name="content">
                     </form>
+                    <div class="image-box-container">
+                        ${this.state.html}
+                    </div>
                 </div>
             </div>
         `;
+
+        let coverUploader = this._shadowRoot.querySelector('.cover-uploader');
+        let coverUploadButton = this._shadowRoot.querySelector('.cover');
+        coverUploadButton.onchange = (e) => {
+            let file = e.target.files[0];
+
+            let currentUser = getCurrentUser();
+
+            let storageRef = firebase.storage().ref(`${currentUser.id}/project/cover/${renderID()}.${file.name.split('.')[1]}`);
+
+            let task = storageRef.put(file);
+
+            let that = this;
+
+            coverUploader.style = "display:";
+
+            task.on('state_changed',
+                function progress(snapshot) {
+                    let percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    if (percentage == 100) percentage = 0;
+                    coverUploader.value = percentage;
+                },
+                function error(err) {
+
+                },
+                async function complete() {
+                    coverUploader.style = "display:none";
+                    let imageLink = await storageRef.getDownloadURL();
+                    that.state.data.cover = imageLink;
+                    that.state.error.cover = '';
+                    that.setState(that.state);
+                }
+            );
+        };
+
+        let contentUploader = this._shadowRoot.querySelector('.content-uploader');
+        let contentUploadButton = this._shadowRoot.querySelector('.content');
+
+        contentUploadButton.onchange = (e) => {
+            let file = e.target.files[0];
+            let currentUser = getCurrentUser();
+            let storageRef = firebase.storage().ref(`${currentUser.id}/project/content/${renderID()}.${file.name.split('.')[1]}`);
+            let task = storageRef.put(file);
+
+            let that = this;
+
+            contentUploader.style = "display:";
+            task.on('state_changed',
+                function progress(snapshot) {
+                    let percentage = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    if (percentage == 100) percentage = 0;
+                    contentUploader.value = percentage;
+                },
+                function error(err) {
+
+                },
+                async function complete() {
+                    contentUploader.style = "display:none";
+                    let imageLink = await storageRef.getDownloadURL();
+                    let content = that.state.data.content;
+                    content.push(imageLink);
+                    that.state.html = '';
+                    for (let i = content.length - 1; i >= 0; i--) {
+                        that.state.html += `<img src="${content[i]}" alt="content">`;
+                    }
+                    that.state.error.content = '';
+                    that.setState(that.state);
+                }
+            );
+        };
+
+        this.$btnCancel = this._shadowRoot.querySelector('.btn-cancel');
+        this.$btnCancel.onclick = () => {
+            router.navigate('/home');
+        }
+
+        this.$btnPublish = this._shadowRoot.querySelector('.btn-publish');
+        this.$btnPublish.onclick = async () => {
+            // lay du lieu tu cac form
+            let cover = this.state.data.cover;
+            let title = this._shadowRoot.querySelector('.title').value;
+            let description = this._shadowRoot.querySelector('.description').value;
+            let content = this.state.data.content;
+            let tag = [];
+            for (let x of this._shadowRoot.querySelector('.choose-tag').elements['tag']) {
+                if (x.checked) tag.push(x.value);
+            }
+
+            // kiem tra du lieu duoc nhap vao
+            let isValid = true;
+
+            if (title == '') {
+                this.state.error.title = 'Your title is invalid!';
+                isValid = false;
+            } else {
+                this.state.data.title = title;
+                this.state.error.title = '';
+            }
+
+            if (cover == '') {
+                this.state.error.cover = 'Your cover is required!';
+                isValid = false;
+            }
+
+            if (tag.length == 0) {
+                this.state.error.tag = 'Your gotta choose one tag at least!';
+                isValid = false;
+            } else {
+                this.state.data.tag = tag;
+                this.state.error.tag = '';
+            }
+
+            if (content.length == 0) {
+                this.state.error.content = 'Your gotta publish something!';
+                isValid = false;
+            }
+
+            if (isValid) {
+                this.state.data.publishDate = new Date().toLocaleString();
+                this.state.data.owner = getCurrentUser().id;
+
+                await firebase.firestore().collection('user').doc(`${this.state.data.owner}`).update({
+                    project: this.state.data.content
+                });
+
+                alert('Sign up successfully!');
+            } else {
+                alert('Oops... Something is not correct!');
+            }
+
+            this.setState(this.state);
+
+            for (let x of tag) {
+                this._shadowRoot.querySelector(`.${x}`).checked = true;
+            }
+        }
     }
 }
 
