@@ -7,7 +7,11 @@ class HomeScreen extends BaseComponent {
 
     render() {
         this._shadowRoot.innerHTML = /*html*/ `
-        
+            <navigation-bar></navigation-bar>
+            <choose-first-topic></choose-first-topic>
+            <content-container></content-container>
+            <modal-project-card></modal-project-card>
+            <footer-box></footer-box>
         `;
     }
 }

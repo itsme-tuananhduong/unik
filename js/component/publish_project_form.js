@@ -13,6 +13,7 @@ class PublishProjectForm extends BaseComponent {
                 title: ''
             },
             data: {
+                ID: '',
                 comment: [],
                 content: [],
                 cover: '',
@@ -28,6 +29,8 @@ class PublishProjectForm extends BaseComponent {
 
     render() {
         this._shadowRoot.innerHTML = /*html*/ `
+            <navigation-bar></navigation-bar>
+            
             <div class="wrapper">
                 <div class="section-1">
                     <!-- upload cover -->
@@ -116,7 +119,23 @@ class PublishProjectForm extends BaseComponent {
                     let imageLink = await storageRef.getDownloadURL();
                     that.state.data.cover = imageLink;
                     that.state.error.cover = '';
+
+                    let title = that._shadowRoot.querySelector('.title').value;
+                    let description = that._shadowRoot.querySelector('.description').value;
+                    let tag = [];
+                    for (let x of that._shadowRoot.querySelector('.choose-tag').elements['tag']) {
+                        if (x.checked) tag.push(x.value);
+                    }
+
+                    that.state.data.description = description;
+                    that.state.data.title = title;
+                    that.state.data.tag = tag;
+
                     that.setState(that.state);
+
+                    for (let x of tag) {
+                        that._shadowRoot.querySelector(`.${x}`).checked = true;
+                    }
                 }
             );
         };
@@ -152,7 +171,23 @@ class PublishProjectForm extends BaseComponent {
                         that.state.html += `<img src="${content[i]}" alt="content">`;
                     }
                     that.state.error.content = '';
+
+                    let title = that._shadowRoot.querySelector('.title').value;
+                    let description = that._shadowRoot.querySelector('.description').value;
+                    let tag = [];
+                    for (let x of that._shadowRoot.querySelector('.choose-tag').elements['tag']) {
+                        if (x.checked) tag.push(x.value);
+                    }
+
+                    that.state.data.description = description;
+                    that.state.data.title = title;
+                    that.state.data.tag = tag;
+
                     that.setState(that.state);
+
+                    for (let x of tag) {
+                        that._shadowRoot.querySelector(`.${x}`).checked = true;
+                    }
                 }
             );
         };
@@ -176,6 +211,8 @@ class PublishProjectForm extends BaseComponent {
 
             // kiem tra du lieu duoc nhap vao
             let isValid = true;
+
+            this.state.data.description = description;
 
             if (title == '') {
                 this.state.error.title = 'Your title is invalid!';
@@ -206,12 +243,21 @@ class PublishProjectForm extends BaseComponent {
             if (isValid) {
                 this.state.data.publishDate = new Date().toLocaleString();
                 this.state.data.owner = getCurrentUser().id;
+                this.state.data.ID = renderID();
+
+                await firebase.firestore().collection('project').add(
+                    this.state.data
+                );
+
+                let response = await firebase.firestore().collection('user').doc(`${this.state.data.owner}`).get();
+                let oldProject = response.data().project;
+                oldProject.push(this.state.data.ID);
 
                 await firebase.firestore().collection('user').doc(`${this.state.data.owner}`).update({
-                    project: this.state.data.content
+                    project: oldProject
                 });
 
-                alert('Sign up successfully!');
+                alert('Publish successfully!');
             } else {
                 alert('Oops... Something is not correct!');
             }
