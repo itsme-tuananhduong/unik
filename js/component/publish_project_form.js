@@ -29,7 +29,6 @@ class PublishProjectForm extends BaseComponent {
 
     render() {
         this._shadowRoot.innerHTML = /*html*/ `
-            <navigation-bar></navigation-bar>
             
             <div class="wrapper">
                 <div class="section-1">
@@ -160,6 +159,7 @@ class PublishProjectForm extends BaseComponent {
                 },
                 function error(err) {
 
+
                 },
                 async function complete() {
                     contentUploader.style = "display:none";
@@ -181,6 +181,7 @@ class PublishProjectForm extends BaseComponent {
 
                     that.state.data.description = description;
                     that.state.data.title = title;
+
                     that.state.data.tag = tag;
 
                     that.setState(that.state);

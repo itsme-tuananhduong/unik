@@ -1,12 +1,12 @@
 import { BaseComponent } from "../component/base_component.js";
-import { getCurrentUser } from "../utility.js";
+import { getDataFromDocs } from "../utility.js";
 
 const style = /*html*/ `
     <style>
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 2;
             left: 0;
             top: 0;
             width: 100%;
@@ -41,58 +41,58 @@ class ModalProjectCard extends BaseComponent {
     constructor() {
         super();
         this.props = {
-            ID: '2os0V5ZuCdBobfOyZC38'
+            ID: ''
         }
         this.state = {
             'project-data': {
-                ownerAvatar: '',
-                ownerName: '',
+                ID: '',
                 comment: [],
                 content: [],
                 cover: '',
                 description: '',
+                owner: '',
                 publishDate: '',
                 tag: [],
                 title: '',
                 totalRespect: 0
             },
             'owner-data': {
-
-            }
+                ID: '',
+                age: '',
+                avatar: '',
+                cover: '',
+                description: '',
+                email: '',
+                follower: [],
+                following: [],
+                jobTitle: '',
+                joinDate: '',
+                label: '',
+                location: '',
+                project: [],
+                savedProject: [],
+                totalRespect: 0,
+                userName: '',
+                webReference: '',
+                workExperience: ''
+            },
+            isLoading: true
         }
-    }
-
-    static get observedAttributes() {
-        return ['id'];
     }
 
     render() {
         this._shadowRoot.innerHTML = /*html*/ `
             ${style}
             <div class="wrapper">
-                <div class="card">
-                    <img class="cover" src="" alt="cover">
-                    <div class="project-info">
-                        <p class="title"></p>
-                        <p class="label"></p>
-                        <p class="total-respect"></p>
-                    </div>
-                    <div class="owner-info">
-                        <img class="owner-avatar" src="" alt="owner-avatar">
-                        <p class="owner-name"></p>
-                    </div>
-                </div>
-
-                <p>${this.props.ID}</p>
-
-                <button class="btn">Click here to Open Modal</button>
+                
+                <button class="btn">View detail</button>
 
                 <div class="modal">
+                    <span class="close">x</span>
                     <div class="modal-content">
-                        <span class="close">x</span>
 
                         <div class="project-owner">
-                            <img src="" alt="">
+                            <img src="${this.state["owner-data"].avatar}" alt="owner-avatar">
                         </div>
 
                         <div class="content"></div>
@@ -106,7 +106,8 @@ class ModalProjectCard extends BaseComponent {
                         <div class="tag"></div>
 
                         <div class="comment-box"></div>
-
+                        
+                        <p>${this.props.ID}</p>
                     </div>
                 </div>
             </div>
@@ -115,40 +116,31 @@ class ModalProjectCard extends BaseComponent {
         this.$btn = this._shadowRoot.querySelector('.btn');
         this.$modal = this._shadowRoot.querySelector('.modal');
         this.$span = this._shadowRoot.querySelector('.close');
+        this.$content = this._shadowRoot.querySelector('.modal-content');
 
-        this.$btn.onclick = async () => {
-            this.$modal.style.display = 'block';
-
-            let project = await firebase.firestore().collection('project').doc(this.props.ID).get();
-
-            let that = this;
-            async function getOwnerData(project) {
-                let projectOwner = await firebase.firestore().collection('user').doc(project.data().owner).get();
-                console.log(projectOwner.data());
-                let data = {
-                    ownerAvatar: `${projectOwner.data().avatar}`,
-                    ownerName: `${projectOwner.data().userName}`,
-                    comment: [],
-                    content: `${project.data().content}`,
-                    cover: `${project.data().cover}`,
-                    description: `${project.data().description}`,
-                    publishDate: `${project.data().description}`,
-                    tag: `${project.data().tag}`,
-                    title: `${project.data().title}`,
-                    totalRespect: `${project.data().totalRespect}`
-                }
-                console.log(data);
-                that.setState(data);
+        if (this.state.isLoading) {
+            this.props.ID = this.id;
+            let getData = async () => {
+                let project = await firebase.firestore().collection('project').where('ID', '==', this.props.ID).get();
+                this.state["project-data"] = getDataFromDocs(project)[0];
+                let owner = await firebase.firestore().collection('user').doc(this.state["project-data"].owner).get();
+                this.state["owner-data"] = owner.data();
+                this.setState(this.state);
             }
-            getOwnerData(project);
+            getData();
 
+            this.state.isLoading = false;
+        }
+
+        this.$btn.onclick = () => {
+            this.$modal.style.display = 'block';
         }
 
         this.$span.onclick = () => {
             this.$modal.style.display = 'none';
         }
 
-        window.onclick = (event) => {
+        this.$modal.onclick = (event) => {
             if (event.target == this.$modal) {
                 this.$modal.style.display = 'none';
             }
