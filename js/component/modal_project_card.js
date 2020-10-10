@@ -76,6 +76,8 @@ class ModalProjectCard extends BaseComponent {
                 webReference: '',
                 workExperience: ''
             },
+            html: '',
+            tag: '',
             isLoading: true
         }
     }
@@ -92,22 +94,37 @@ class ModalProjectCard extends BaseComponent {
                     <div class="modal-content">
 
                         <div class="project-owner">
-                            <img src="${this.state["owner-data"].avatar}" alt="owner-avatar">
+                            <img class="owner-avatar" src="${this.state["owner-data"].avatar}" alt="owner-avatar">
+                            <p class="owner-name">${this.state["owner-data"].userName}</p>
+                            <button class="follow">Follow</button>
                         </div>
 
-                        <div class="content"></div>
+                        <div class="content">${this.state.html}</div>
 
-                        <div class="side-bar"></div>
+                        <div class="side-bar">
+                            <button class="follow">Follow</button>
+                            <button class="save">Save</button>
+                            <button class="Respect">Respect</button>
+                        </div>
 
-                        <div class="user-info"></div>
+                        <div class="user-info">
+                            <img src="${this.state["owner-data"].avatar}" alt="user-info" class="user-avatar">
+                            <p class="user-name">${this.state["owner-data"].userName}</p>
+                            <p class="user-location">${this.state["owner-data"].location}</p>
+                            <button class="follow">Follow</button>
+                        </div>
 
-                        <div class="project-info"></div>
+                        <div class="project-info">
+                            <p class="project-title">${this.state["project-data"].title}</p>
+                            <p class="project-description">${this.state["project-data"].description}</p>
+                            <p class="project-total-respect">${this.state["project-data"].totalRespect}</p>
+                            <p class="project-comment">${this.state["project-data"].comment.length}</p>
+                            <p class="project-publish-date">${this.state["project-data"].publishDate}</p>
+                        </div>
 
-                        <div class="tag"></div>
+                        <div class="tag">${this.state.tag}</div>
 
                         <div class="comment-box"></div>
-                        
-                        <p>${this.props.ID}</p>
                     </div>
                 </div>
             </div>
@@ -125,6 +142,15 @@ class ModalProjectCard extends BaseComponent {
                 this.state["project-data"] = getDataFromDocs(project)[0];
                 let owner = await firebase.firestore().collection('user').doc(this.state["project-data"].owner).get();
                 this.state["owner-data"] = owner.data();
+
+                for (let i = 0; i < this.state["project-data"].content.length; i++) {
+                    this.state.html += `<img src="${this.state["project-data"].content[i]}" alt="content">`;
+                }
+
+                for (let i = 0; i < this.state["project-data"].tag.length; i++) {
+                    this.state.tag += `<p class="project-tag">${this.state["project-data"].tag[i]}</p>`;
+                }
+
                 this.setState(this.state);
             }
             getData();
