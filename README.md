@@ -1,3 +1,3 @@
-# UNIK - Network & Online Portfolio for Designer
+# unik - network & online portfolio for designer
 
-Code Intensive JS - 48 - Project
+code intensive js - 48 - project
